@@ -8,9 +8,11 @@ public class PlayerMovement3D : MonoBehaviour
 
     public Vector3 spawnPosition;
 
-    public float moveSpeed = 10;
+    public float movementSpeed = 10f;
 
-    public float rotationSpeed = 10;
+    public float maxSpeed = 50f;
+
+    //public float rotationSpeed = 10;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -22,13 +24,23 @@ public class PlayerMovement3D : MonoBehaviour
     void Update()
     {
         Vector3 playerMovement = new Vector3
-            (Input.GetAxis("Horizontal"), 
-            0,
-            (Input.GetAxis("Vertical")));
-        transform.Translate(playerMovement * moveSpeed * Time.deltaTime);
+            (Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            
+            transform.Translate(playerMovement * maxSpeed * Time.deltaTime);
 
-        float horizontalInput = Input.GetAxis("Horizontal");
+        if (Input.GetAxis("Vertical") != 0)
+        {
+            //this will increase the move speed when you have forward or backward button pressed down
+            movementSpeed += Time.deltaTime * 0.2f;
+        }
+        else
+        {
+            //this will reset the movement speed to 10 (this could be any number you want)
+            movementSpeed = 10;
+        }
 
-        transform.Rotate(0, horizontalInput * rotationSpeed * Time.deltaTime, 0);
+        //float horizontalInput = Input.GetAxis("Horizontal");
+
+        //transform.Rotate(0, horizontalInput * rotationSpeed * Time.deltaTime, 0);
     }
 }
