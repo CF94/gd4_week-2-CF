@@ -2,80 +2,42 @@ using UnityEngine;
 
 public class CarControl : MonoBehaviour
 {
-    public float motorTorque = 2000;
-    public float brakeTorque = 2000;
-    public float maxSpeed = 20;
-    public float steeringRange = 30;
-    public float steeringRangeAtMaxSpeed = 10;
-    public float centreOfGravityOffset = -1f;
-
-    WheelControl[] wheels;
-    Rigidbody rigidBody;
-
-    // Start is called before the first frame update
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public float speed = 20f;
+    //public float maxSpeed = 50.f;
+    public float turnSpeed = 45f;
+    //public float horizontalInput;
+    //public float verticalInput;
+    Rigidbody rb;
+    public string playerIndex;
     void Start()
     {
-        rigidBody = GetComponent<Rigidbody>();
-
-        // Adjust center of mass vertically, to help prevent the car from rolling
-        rigidBody.centerOfMass += Vector3.up * centreOfGravityOffset;
-
-        // Find all child GameObjects that have the WheelControl script attached
-        wheels = GetComponentsInChildren<WheelControl>();
+        rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        float horizontal = Input.GetAxis("Horizontal" + playerIndex);
+        float vertical = Input.GetAxis("Vertical" + playerIndex);
+        //horizontal = Input.GetAxis("Horizontal");
+        //vertical = Input.GetAxis("Vertical");
 
-        float vInput = Input.GetAxis("Vertical");
-        float hInput = Input.GetAxis("Horizontal");
-
-        // Calculate current speed in relation to the forward direction of the car
-        // (this returns a negative number when traveling backwards)
-        float forwardSpeed = Vector3.Dot(transform.forward, rigidBody.linearVelocity);
-
-
-        // Calculate how close the car is to top speed
-        // as a number from zero to one
-        float speedFactor = Mathf.InverseLerp(0, maxSpeed, forwardSpeed);
-
-        // Use that to calculate how much torque is available 
-        // (zero torque at top speed)
-        float currentMotorTorque = Mathf.Lerp(motorTorque, 0, speedFactor);
-
-        // …and to calculate how much to steer 
-        // (the car steers more gently at top speed)
-        float currentSteerRange = Mathf.Lerp(steeringRange, steeringRangeAtMaxSpeed, speedFactor);
-
-        // Check whether the user input is in the same direction 
-        // as the car's velocity
-        bool isAccelerating = Mathf.Sign(vInput) == Mathf.Sign(forwardSpeed);
-
-        foreach (var wheel in wheels)
+        if (Input.GetAxis("Vertical" + playerIndex) != 0)
         {
-            // Apply steering to Wheel colliders that have "Steerable" enabled
-            if (wheel.steerable)
-            {
-                wheel.WheelCollider.steerAngle = hInput * currentSteerRange;
-            }
-
-            if (isAccelerating)
-            {
-                // Apply torque to Wheel colliders that have "Motorized" enabled
-                if (wheel.motorized)
-                {
-                    wheel.WheelCollider.motorTorque = vInput * currentMotorTorque;
-                }
-                wheel.WheelCollider.brakeTorque = 0;
-            }
-            else
-            {
-                // If the user is trying to go in the opposite direction
-                // apply brakes to all wheels
-                wheel.WheelCollider.brakeTorque = Mathf.Abs(vInput) * brakeTorque;
-                wheel.WheelCollider.motorTorque = 0;
-            }
+            //this will increase the move speed when you have forward or backward button pressed down
+            speed += Time.deltaTime * 1f;
         }
+        else
+        {
+            //this will reset the movement speed to 10 (this could be any number you want)
+            speed = 20;
+        }
+                       
+        // Move the vehicle forward
+        transform.Translate(Vector3.forward * Time.deltaTime * speed * vertical);
+        transform.Rotate(Vector3.up, turnSpeed *horizontal * Time.deltaTime);
+
+        //rb.AddForce(Vector3.forward * speed)
     }
 }
