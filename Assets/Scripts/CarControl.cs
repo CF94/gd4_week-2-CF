@@ -9,6 +9,7 @@ public class CarControl : MonoBehaviour
     //public float horizontalInput;
     //public float verticalInput;
     Rigidbody rb;
+    // Player index refers to assigning player values (ie Player 1, Player 2 etc).
     public string playerIndex;
     void Start()
     {
@@ -36,7 +37,7 @@ public class CarControl : MonoBehaviour
                        
         // Move the vehicle forward
         transform.Translate(Vector3.forward * Time.deltaTime * speed * vertical);
-        transform.Rotate(Vector3.up, turnSpeed *horizontal * Time.deltaTime);
+        transform.Rotate(Vector3.up, turnSpeed * horizontal * Time.deltaTime);
 
         //rb.AddForce(Vector3.forward * speed)
     }
